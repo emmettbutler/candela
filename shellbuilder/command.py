@@ -29,6 +29,7 @@ class Command(object):
                     return (False, "Missing argument %s (-%s) - %s" % (name, kw, kwargs))
             return (True, "")
         self.validate = validator
+        self.default_validate = validator
 
         self.new_menu = ''
 
