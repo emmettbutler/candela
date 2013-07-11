@@ -34,7 +34,7 @@ class MyShell(Shell):
         quit_com = self.build_quit_command()
         # TODO - stickers demo
         # TODO - new menu
-        # TODO - builtin commands
+        # TODO - builtin commands / scripts
 
         # define menus
         main_menu = Menu('main')
