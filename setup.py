@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup(name='shellbuilder',
+setup(name='candela',
       version='1.0',
-      packages=['shellbuilder'],
+      packages=['candela'],
       )

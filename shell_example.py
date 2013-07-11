@@ -1,9 +1,9 @@
 import getpass
 
-from shellbuilder.shell import Shell
-from shellbuilder.menu import Menu
-from shellbuilder.command import Command, QuitCommand
-from shellbuilder import constants
+from candela.shell import Shell
+from candela.menu import Menu
+from candela.command import Command, QuitCommand
+from candela import constants
 
 
 class MyShell(Shell):
