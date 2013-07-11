@@ -150,7 +150,9 @@ class Shell():
         while keyin != 10:
             keyin = self.stdscr.getch()
             _y,_x = self.stdscr.getyx()
-            index = _x - 2
+            index = _x - 2  # TODO - all of the 2's here are magic numbers that depend
+                            # on the length of the prompt string being 2.
+                            # allow a user-selectable prompt and check its width
             #self.stdscr.addstr(20, 70, str(keyin))
             if keyin in [127, 263]:  # backspaces
                 buff = buff[:index] + buff[index+1:]
