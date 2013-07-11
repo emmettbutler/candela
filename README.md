@@ -15,3 +15,5 @@ of one or more `Commands`.
 A `Menu` has a title and a list of `Commands`.
 
 It supports up and down arrows for history
+
+Named arguments (required and optional), positional arguments
