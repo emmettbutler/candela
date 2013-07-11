@@ -52,6 +52,8 @@ class MyShell(Shell):
         com = Command('named <-f filename> [-e othername]', 'Demonstrate named arguments')
         def _run(*args, **kwargs):
             self.put("%s: %s" % ("f", kwargs['f']))
+            if 'g' in kwargs.keys():
+                self.put("%s: %s" % ("g", kwargs['g']))
             return constants.CHOICE_VALID
         com.run = _run
         return com
