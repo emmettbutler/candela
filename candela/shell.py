@@ -149,26 +149,40 @@ class Shell():
         hist_counter = 1
         while keyin != 10:
             keyin = self.stdscr.getch()
+            _y,_x = self.stdscr.getyx()
+            index = _x - 2
             #self.stdscr.addstr(20, 70, str(keyin))
             if keyin in [127, 263]:  # backspaces
-                buff = buff[:-1]
-                self.stdscr.addstr(self.height-1, 0, " "*(self.width-3))
-                self.stdscr.addstr(self.height-1, 0, "> %s" % buff)
+                buff = buff[:index] + buff[index+1:]
+                self.redraw_buffer(buff)
+                self.stdscr.move(_y, max(_x, 2))
             elif keyin in [curses.KEY_DOWN, curses.KEY_UP]:
                 hist_counter,buff = self.process_history_command(keyin, hist_counter)
             elif keyin == curses.KEY_F1:
                 curses.endwin()
                 sys.exit()
+            elif keyin in [260, 261]:
+                if keyin == 260:
+                    newx = max(_x - 1, 2)
+                elif keyin == 261:
+                    newx = min(_x + 1, len(buff) + 2)
+                self.stdscr.move(_y, newx)
             elif keyin >= 32 and keyin <= 126:
-                buff += chr(keyin)
+                buff = buff[:index-1] + chr(keyin) + buff[index-1:]
+                self.redraw_buffer(buff)
+                self.stdscr.move(_y, min(_x, len(buff) + 2))
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
 
+    def redraw_buffer(self, buff):
+        self.stdscr.addstr(self.height-1, 0, " "*(self.width-3))
+        self.stdscr.addstr(self.height-1, 0, "> %s" % buff)
+
     def process_history_command(self, keyin, hist_counter):
         hist_commands = [(s,c) for s,c in self.backbuffer if c]
         if not hist_commands:
-            return
+            return hist_counter, ""
 
         #hist_commands.reverse()
 
