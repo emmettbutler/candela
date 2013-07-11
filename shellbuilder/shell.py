@@ -207,6 +207,7 @@ class Shell():
         """
         ret_choice = None
         while ret_choice != constants.CHOICE_QUIT:
+            success = True
             ret_choice = constants.CHOICE_INVALID
             choice = self.script_in()
             if choice:
@@ -219,12 +220,13 @@ class Shell():
                 continue
             for command in self.get_menu().commands:
                 if tokens[0] == command.name or tokens[0] in command.aliases:
-                    success, message = command.validate(tokens)
+                    args, kwargs = command.parse_command(tokens)
+                    success, message = command.validate(*args, **kwargs)
                     if not success:
                         self.put(message)
                         break
                     else:
-                        ret_choice = command.run(tokens)
+                        ret_choice = command.run(*args, **kwargs)
                         if command.new_menu and ret_choice != constants.FAILURE:
                             self.menu = command.new_menu
             if success:

@@ -21,6 +21,7 @@ class MyShell(Shell):
 
         # define commands
         hello_world_com = self.build_hello_command()
+        named_com = self.build_named_args_command()
         complex_com = self.build_complex_command()
         invalid_com = self.build_invalid_command()
         quit_com = self.build_quit_command()
@@ -30,40 +31,48 @@ class MyShell(Shell):
         #menu display title
         main_menu.title = "Main menu"
         # list of Command objects making up menu
-        main_menu.commands = [hello_world_com, complex_com, invalid_com, quit_com]
+        main_menu.commands = [hello_world_com, named_com, complex_com, invalid_com, quit_com]
 
         # list of menus
         self.menus = [main_menu]
         # default menu
         self.menu = 'main'
 
+        self.put("Welcome to shellbuilder! Here's how to use it...")
+
     def build_hello_command(self):
         com = Command('sayhello', 'Print a friendly greeting')
-        def _run(tokens):
-            for token in tokens:
-                self.put(token)
+        def _run(*args, **kwargs):
             self.put("Hello, world!")
+            return constants.CHOICE_VALID
+        com.run = _run
+        return com
+
+    def build_named_args_command(self):
+        com = Command('named <-f filename> [-e othername]', 'Demonstrate named arguments')
+        def _run(*args, **kwargs):
+            self.put("%s: %s" % ("f", kwargs['f']))
             return constants.CHOICE_VALID
         com.run = _run
         return com
 
     def build_invalid_command(self):
         com = Command('nope', 'I do not run')
-        def _run(tokens):
+        def _run(*args, **kwargs):
             self.put("Who cares?")
             return constants.CHOICE_VALID
         com.run = _run
 
-        def _val(tokens):
+        def _val(*args, **kwargs):
             return (False, "Command failed because I said so")
         com.validate = _val
 
         return com
 
     def build_complex_command(self):
-        com = Command('meaning_of_life', 'Find the meaning of life')
-        def _run(tokens):
-            if len(tokens) > 1 and tokens[1] == "and_everything":
+        com = Command('meaning_of_life also', 'Find the meaning of life')
+        def _run(*args, **kwargs):
+            if len(args) == 1 and args[0] == "and_everything":
                 self.put(self.do_something_complex())
             else:
                 self.put("Wouldn't you like to know")
