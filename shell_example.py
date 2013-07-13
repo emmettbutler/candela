@@ -2,7 +2,7 @@ import getpass
 
 from candela.shell import Shell
 from candela.menu import Menu
-from candela.command import Command, QuitCommand
+from candela.command import Command, QuitCommand, RunScriptCommand, BackCommand
 from candela import constants
 
 
@@ -33,8 +33,7 @@ class MyShell(Shell):
         invalid_com = self.build_invalid_command()
         quit_com = self.build_quit_command()
         sticker_com = self.build_sticker_command()
-        # TODO - new menu
-        # TODO - builtin commands / scripts
+        builtins_com = self.build_builtin_command()
 
         # define menus
         main_menu = Menu('main')
@@ -42,10 +41,17 @@ class MyShell(Shell):
         main_menu.title = "Main menu"
         # list of Command objects making up menu
         main_menu.commands = [hello_world_com, named_com, complex_com, sticker_com,
-                              invalid_com, quit_com]
+                              builtins_com, invalid_com, quit_com]
+
+        script_com = self.build_script_command()
+        back_com = self.build_back_command()
+
+        builtins_menu = Menu('builtins')
+        builtins_menu.title = "Built-in commands menu"
+        builtins_menu.commands = [script_com, back_com, quit_com]
 
         # list of menus
-        self.menus = [main_menu]
+        self.menus = [main_menu, builtins_menu]
         # default menu
         self.menu = 'main'
 
@@ -158,6 +164,20 @@ data to the user.
             return constants.CHOICE_VALID
         com.run = _run
         return com
+
+    def build_builtin_command(self):
+        com = Command('builtins', 'Go to builtin commands menu')
+        def _run(*args, **kwargs):
+            return constants.CHOICE_VALID
+        com.run = _run
+        com.new_menu = 'builtins'
+        return com
+
+    def build_script_command(self):
+        return RunScriptCommand(self)
+
+    def build_back_command(self):
+        return BackCommand('main')
 
     def build_quit_command(self):
         quit_com = QuitCommand(self.name)
