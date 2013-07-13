@@ -57,13 +57,12 @@ class Shell():
 
     def sticker(self, output, new_output="", pos=None):
         if len(self.stickers) > 0:
-            sort = sorted(self.stickers, key=lambda x: x[1][0])
+            sort = sorted(self.stickers, key=lambda x: x[1][0], reverse=True)
             ht = sort[0][1][0]+1
         else:
             ht = 3
 
-        if not pos:
-            pos = (ht, self.width - 20)
+        pos = pos or (ht, self.width - 20)
 
         match = None
         for text,_pos in self.stickers:

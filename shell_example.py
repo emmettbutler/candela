@@ -32,7 +32,7 @@ class MyShell(Shell):
         complex_com = self.build_complex_command()
         invalid_com = self.build_invalid_command()
         quit_com = self.build_quit_command()
-        # TODO - stickers demo
+        sticker_com = self.build_sticker_command()
         # TODO - new menu
         # TODO - builtin commands / scripts
 
@@ -41,7 +41,8 @@ class MyShell(Shell):
         #menu display title
         main_menu.title = "Main menu"
         # list of Command objects making up menu
-        main_menu.commands = [hello_world_com, named_com, complex_com, invalid_com, quit_com]
+        main_menu.commands = [hello_world_com, named_com, complex_com, sticker_com,
+                              invalid_com, quit_com]
 
         # list of menus
         self.menus = [main_menu]
@@ -142,6 +143,14 @@ This is a command that always fails to validate.
 Commands can run arbitrary python via a callback. Here's a callback that reads a
 file from your local drive and prints it to the shell.
             """)
+            return constants.CHOICE_VALID
+        com.run = _run
+        return com
+
+    def build_sticker_command(self):
+        com = Command('make_sticker text', 'Make a new sticker')
+        def _run(*args, **kwargs):
+            self.sticker(" ".join(args))
             return constants.CHOICE_VALID
         com.run = _run
         return com
