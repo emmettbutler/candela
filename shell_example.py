@@ -150,6 +150,10 @@ file from your local drive and prints it to the shell.
     def build_sticker_command(self):
         com = Command('make_sticker text', 'Make a new sticker')
         def _run(*args, **kwargs):
+            self.put("""
+This command places a 'sticker' on the terminal. Use these to present persistent
+data to the user.
+            """)
             self.sticker(" ".join(args))
             return constants.CHOICE_VALID
         com.run = _run

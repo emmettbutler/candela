@@ -95,6 +95,7 @@ class Shell():
                 self._header_right = len(line)
             ht += 1
         self._header_bottom = ht
+        self.mt_width = self._header_right + 49
 
     def get_helpstring(self):
         _menu = self.get_menu()
