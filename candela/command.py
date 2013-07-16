@@ -121,7 +121,7 @@ class Command(object):
         positional arguments are required.
 
         Command definition semantics:
-        definition      ::= command_name (positional | named)*
+        definition      ::= command_name (positional)* (named)*
         command_name    ::= (letter | digit | _)*
         positional      ::= (letter | digit | _)*
         argument        ::= (letter | digit | _)*
@@ -184,30 +184,23 @@ class Command(object):
     def __str__(self):
         return "%s\n    %s" % (self.definition, self.description)
 
-    def isoptional(self, token):
-        if len(token.split()) != 2:
-            return True
-        return (self.isnamed(token) and token.startswith("[") and token.endswith("]"))
-
-    def isnamed(self, token):
-        return (len(token.split()) == 2 and token.split()[0].startswith("-"))
-
-    def isrequired(self, token):
-        return (token.startswith("<") and token.endswith(">"))
-
     def alias(self, alias):
+        """
+        Create an alias for this command.
+        An alias is simply an alternate name for the command.
+        A command can be invoked by using any of its aliases or its name.
+
+        Args:
+        alias       - The string by which to alias this command
+        """
         if alias not in self.aliases:
             self.aliases.append(alias)
 
-    def num_required_args(self):
-        counter = 0
-        for token in self.definition.split():
-            if token.startswith("<") and token.endswith(">"):
-                counter += 1
-        return counter
-
-
 class BackCommand(Command):
+    """
+    A command that, on success, reverts the latest new_menu action by resetting
+    the shell to the previous menu.
+    """
     def __init__(self, tomenu):
         super(BackCommand, self).__init__('back', 'Back to the %s menu' % tomenu)
         self.new_menu = tomenu
@@ -220,6 +213,11 @@ class BackCommand(Command):
 
 
 class QuitCommand(Command):
+    """
+    A command that, on success, quits the shell and cleans up the window.
+    It does this by returning CHOICE_QUIT, which is the escape sequence
+    for which the shell's main loop is listening.
+    """
     def __init__(self, name):
         super(QuitCommand, self).__init__('quit', 'Quit %s' % name)
 
@@ -231,6 +229,9 @@ class QuitCommand(Command):
 
 
 class RunScriptCommand(Command):
+    """
+    A command that, on success, loads and runs a candela shell script.
+    """
     def __init__(self, shell):
         super(RunScriptCommand, self).__init__('run scriptfile', 'Run a script')
 
