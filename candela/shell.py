@@ -166,9 +166,9 @@ class Shell():
             index = _x - len(self.prompt)
             #self.stdscr.addstr(20, 70, str(keyin))
             if keyin in [127, 263]:  # backspaces
-                buff = buff[:index] + buff[index+1:]
+                buff = buff[:index-3] + buff[index-2:]
                 self.redraw_buffer(buff)
-                self.stdscr.move(_y, max(_x, len(self.prompt)))
+                self.stdscr.move(_y, max(_x-len(self.prompt)-1, len(self.prompt)))
             elif keyin in [curses.KEY_DOWN, curses.KEY_UP]:
                 hist_counter,buff = self.process_history_command(keyin, hist_counter)
             elif keyin == curses.KEY_F1:

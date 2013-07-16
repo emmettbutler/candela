@@ -62,7 +62,7 @@ This is especially good for custom offline tools for games or web production.
 For example, if your game requires lots of data in a custom XML format, you can
 use Candela to easily set up an editor for that data.
 
-This is an instructional shell app that demonstrates the functionality of Candela.
+This is an instructional shell app built in Candela that demonstrates its functionality.
 Try any of the commands listed in the menu bar to continue.
         """)
 
