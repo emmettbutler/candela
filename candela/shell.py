@@ -68,26 +68,19 @@ class Shell():
         self.script_lines = self._parse_script_file(scriptfile)
         self.script_counter = 0
 
-    def _print_backbuffer(self):
+    def get_helpstring(self):
         """
-        Print the previously printed output above the current command line.
+        Get the help string for the current menu.
 
-        candela.shell.Shell stores previously printed commands and output
-        in a backbuffer. Like a normal shell, it handles printing these lines
-        in reverse order to allow the user to see their past work.
+        This string contains a preformatted list of commands and their
+        descriptions from the current menu.
         """
-        rev = list(self.backbuffer)
-        rev.reverse()
-        i = 0
+        _menu = self.get_menu()
+        if not _menu:
+            return
 
-        for string, iscommand in rev:
-            ypos = self.height-2-i
-            if ypos > 0:
-                printstring = string
-                if iscommand:
-                    printstring = "%s%s" % (self.prompt, string)
-                self.stdscr.addstr(ypos,0,printstring)
-            i += 1
+        helpstring = "\n\n" + _menu.title + "\n" + "-"*20 + "\n" + _menu.options()
+        return helpstring
 
     def sticker(self, output, new_output="", pos=None):
         """
@@ -128,19 +121,32 @@ class Shell():
         sticker = (new_output or output, match[1] if match else pos)
         self.stickers.append(sticker)
 
-        self.update_screen()
+        self._update_screen()
 
-    def print_stickers(self):
+    def remove_sticker(self, text):
+        """
+        Remove the sticker with the given text from the window
+
+        Args:
+        text    - The text of the sticker to remove
+        """
+        self.stickers = [a for a in self.stickers if a[0] != text]
+
+
+    def _print_stickers(self):
+        """
+        Print all current stickers at the appropriate positions
+        """
         for text,pos in self.stickers:
             _y,_x = pos
             if _x + len(text) > self.width:
                 _x = self.width - len(text) - 1
             self.stdscr.addstr(_y, _x, text)
 
-    def remove_sticker(self, text):
-        self.stickers = [a for a in self.stickers if a[0] != text]
-
-    def print_header(self):
+    def _print_header(self):
+        """
+        Print the header in the appropriate position
+        """
         ht = 0
         for line in self.header.split("\n"):
             self.stdscr.addstr(ht, 0, line + (" "*self._header_right_margin))
@@ -151,15 +157,31 @@ class Shell():
         self._header_bottom = ht
         self.mt_width = self._header_right + 49
 
-    def get_helpstring(self):
-        _menu = self.get_menu()
-        if not _menu:
-            return
+    def _print_backbuffer(self):
+        """
+        Print the previously printed output above the current command line.
 
-        helpstring = "\n\n" + _menu.title + "\n" + "-"*20 + "\n" + _menu.options()
-        return helpstring
+        candela.shell.Shell stores previously printed commands and output
+        in a backbuffer. Like a normal shell, it handles printing these lines
+        in reverse order to allow the user to see their past work.
+        """
+        rev = list(self.backbuffer)
+        rev.reverse()
+        i = 0
 
-    def print_help(self):
+        for string, iscommand in rev:
+            ypos = self.height-2-i
+            if ypos > 0:
+                printstring = string
+                if iscommand:
+                    printstring = "%s%s" % (self.prompt, string)
+                self.stdscr.addstr(ypos,0,printstring)
+            i += 1
+
+    def _print_help(self):
+        """
+        Print the menu help box for the current menu
+        """
         _helpstring = self.get_helpstring()
         if not _helpstring:
             return
@@ -173,8 +195,20 @@ class Shell():
             self.stdscr.addstr(ht, _x, line + " "*15)
             ht += 1
 
-    def put(self, output, command=False, pos=None):
-        self.update_screen()
+    def put(self, output, command=False):
+        """
+        Print the output string on the bottom line of the shell window
+        Also pushes the backbuffer up the screen by the number of lines
+        in output.
+
+        Args:
+        output  - The string to print. May contain newlines
+
+        Kwargs:
+        command - False if the string was not a user-entered command,
+                  True otherwise (users of Candela should always use False)
+        """
+        self._update_screen()
 
         if not output:
             return
@@ -182,8 +216,6 @@ class Shell():
         output = str(output)
 
         _x,_y = (self.height-1, 0)
-        if pos:
-            _x,_y = pos
 
         lines = []
         for line in output.split('\n'):
@@ -207,6 +239,17 @@ class Shell():
                 self.backbuffer = self.backbuffer[index:] + [to_append]
 
     def _input(self, prompt):
+        """
+        Handle user input on the shell window.
+        Works similarly to python's raw_input().
+        Takes a prompt and returns the raw string entered before the return key
+        by the user.
+
+        The input is returned withnewlines stripped.
+
+        Args:
+        prompt  - The text to display prompting the user to enter text
+        """
         self.put(prompt)
         keyin = ''
         buff = ''
@@ -215,13 +258,13 @@ class Shell():
             keyin = self.stdscr.getch()
             _y,_x = self.stdscr.getyx()
             index = _x - len(self.prompt)
-            #self.stdscr.addstr(20, 70, str(keyin))
+            #self.stdscr.addstr(20, 70, str(keyin))  # for debugging
             if keyin in [127, 263]:  # backspaces
                 buff = buff[:index-3] + buff[index-2:]
-                self.redraw_buffer(buff)
+                self._redraw_buffer(buff)
                 self.stdscr.move(_y, max(_x-len(self.prompt)-1, len(self.prompt)))
             elif keyin in [curses.KEY_DOWN, curses.KEY_UP]:
-                hist_counter,buff = self.process_history_command(keyin, hist_counter)
+                hist_counter,buff = self._process_history_command(keyin, hist_counter)
             elif keyin == curses.KEY_F1:
                 curses.endwin()
                 sys.exit()
@@ -233,17 +276,31 @@ class Shell():
                 self.stdscr.move(_y, newx)
             elif keyin >= 32 and keyin <= 126:
                 buff = buff[:index-1] + chr(keyin) + buff[index-1:]
-                self.redraw_buffer(buff)
+                self._redraw_buffer(buff)
                 self.stdscr.move(_y, min(_x, len(buff) + len(self.prompt)))
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
 
-    def redraw_buffer(self, buff):
+    def _redraw_buffer(self, buff):
+        """
+        Clear the bottom line and re-print the given string on that line
+
+        Args:
+        buff    - The line to print on the cleared bottom line
+        """
         self.stdscr.addstr(self.height-1, 0, " "*(self.width-3))
         self.stdscr.addstr(self.height-1, 0, "%s%s" % (self.prompt, buff))
 
-    def process_history_command(self, keyin, hist_counter):
+    def _process_history_command(self, keyin, hist_counter):
+        """
+        Get the next command from the backbuffer and return it
+        Also return the modified buffer counter.
+
+        Args:
+        keyin           - The key just pressed
+        hist_counter    - The current position in the backbuffer
+        """
         hist_commands = [(s,c) for s,c in self.backbuffer if c]
         if not hist_commands:
             return hist_counter, ""
@@ -261,10 +318,11 @@ class Shell():
             hist_counter -= 1
         return hist_counter, buff
 
-    def print_menu_header(self):
-        self.put(self.get_helpstring())
-
-    def script_in(self):
+    def _script_in(self):
+        """
+        Substitute for _input used when reading from a script.
+        Returns the next command from the script being read.
+        """
         if not self.script_lines:
             return None
 
@@ -276,18 +334,23 @@ class Shell():
         return command
 
     def main_loop(self):
-        """main shell IO loop:
-        get an input command
-        split into tokens
-        find matching command
-        validate tokens for command
-        run command
+        """
+        The main shell IO loop.
+        The sequence of events is as follows:
+            get an input command
+            split into tokens
+            find matching command
+            validate tokens for command
+            run command
+
+        This loop can be broken out of only with by a command returning
+        constants.CHOICE_QUIT or by pressing F1
         """
         ret_choice = None
         while ret_choice != constants.CHOICE_QUIT:
             success = True
             ret_choice = constants.CHOICE_INVALID
-            choice = self.script_in()
+            choice = self._script_in()
             if choice:
                 self.put("%s%s" % (self.prompt, choice))
             else:
@@ -314,12 +377,52 @@ class Shell():
         return self
 
     def get_menu(self):
+        """
+        Get the current menu as a Menu
+        """
         if not self.menus: return
         return [a for a in self.menus if a.name == self.menu][0]
 
-    def timeout(self, func, args=(), kwargs={}, timeout_duration=10, default=None):
-        """create a new thread, run func in the thread for a max of
-        timeout_duraction seconds"""
+    def defer(self, func, args=(), kwargs={}, timeout_duration=10, default=None):
+        """
+        Create a new thread, run func in the thread for a max of
+        timeout_duration seconds
+        This is useful for blocking operations that must be performed
+        after the next window refresh.
+        For example, if a command should set a sticker when it starts executing
+        and then clear that sticker when it's done, simply using the following
+        will not work:
+
+        def _run(*args, **kwargs):
+            self.sticker("Hello!")
+            # do things...
+            self.remove_sticker("Hello!")
+
+        This is because the sticker is both added and removed in the same
+        refresh loop of the window. Put another way, the sticker is added and
+        removed before the window gets redrawn.
+
+        defer() can be used to get around this by scheduling the sticker
+        to be removed shortly after the next window refresh, like so:
+
+        def _run(*args, **kwargs):
+            self.sticker("Hello!")
+            # do things...
+            def clear_sticker():
+                time.sleep(.1)
+                self.remove_sticker("Hello!")
+            self.defer(clear_sticker)
+
+        Args:
+        func        - The callback function to run in the new thread
+
+        Kwargs:
+        args        - The arguments to pass to the threaded function
+        kwargs      - The keyword arguments to pass to the threaded function
+        timeout_duration - the amount of time in seconds to wait before
+                           killing the thread
+        default     - The value to return in case of a timeout
+        """
         class InterruptableThread(threading.Thread):
             def __init__(self):
                 threading.Thread.__init__(self)
@@ -335,9 +438,15 @@ class Shell():
             return it.result
 
     def end(self):
+        """
+        End the current Candela shell and safely shut down the curses session
+        """
         curses.endwin()
 
-    def update_screen(self):
+    def _update_screen(self):
+        """
+        Refresh the screen and redraw all elements in their appropriate positions
+        """
         self.stdscr.clear()
 
         self._print_backbuffer()
@@ -345,10 +454,10 @@ class Shell():
         if self.width < self._header_right + 80 or self.height < self._header_bottom + 40:
             pass
         else:
-            self.print_header()
+            self._print_header()
             if self.should_show_help:
-                self.print_help()
-        self.print_stickers()
+                self._print_help()
+        self._print_stickers()
 
         self.stdscr.refresh()
 
