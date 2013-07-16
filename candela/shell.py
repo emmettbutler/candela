@@ -27,6 +27,8 @@ class Shell():
         self._header_bottom = 0
         self._header_right = 0
 
+        self.prompt = "butts> "
+
     def parse_script_file(self, filename):
         self.scriptfile = filename
         try:
@@ -52,7 +54,7 @@ class Shell():
             if ypos > 0:
                 printstring = string
                 if iscommand:
-                    printstring = "> %s" % string
+                    printstring = "%s%s" % (self.prompt, string)
                 self.stdscr.addstr(ypos,0,printstring)
             i += 1
 
@@ -147,7 +149,7 @@ class Shell():
             # add it to backbuffer
             backbuf_string = line
             to_append = (backbuf_string, command)
-            if line != "> ":
+            if line != self.prompt:
                 self.backbuffer.append(to_append)
                 # TODO - stop backbuffer from growing huge
 
@@ -159,14 +161,14 @@ class Shell():
         while keyin != 10:
             keyin = self.stdscr.getch()
             _y,_x = self.stdscr.getyx()
-            index = _x - 2  # TODO - all of the 2's here are magic numbers that depend
+            index = _x - len(self.prompt)  # TODO - all of the 2's here are magic numbers that depend
                             # on the length of the prompt string being 2.
                             # allow a user-selectable prompt and check its width
             #self.stdscr.addstr(20, 70, str(keyin))
             if keyin in [127, 263]:  # backspaces
                 buff = buff[:index] + buff[index+1:]
                 self.redraw_buffer(buff)
-                self.stdscr.move(_y, max(_x, 2))
+                self.stdscr.move(_y, max(_x, len(self.prompt)))
             elif keyin in [curses.KEY_DOWN, curses.KEY_UP]:
                 hist_counter,buff = self.process_history_command(keyin, hist_counter)
             elif keyin == curses.KEY_F1:
@@ -174,21 +176,21 @@ class Shell():
                 sys.exit()
             elif keyin in [260, 261]:
                 if keyin == 260:
-                    newx = max(_x - 1, 2)
+                    newx = max(_x - 1, len(self.prompt))
                 elif keyin == 261:
-                    newx = min(_x + 1, len(buff) + 2)
+                    newx = min(_x + 1, len(buff) + len(self.prompt))
                 self.stdscr.move(_y, newx)
             elif keyin >= 32 and keyin <= 126:
                 buff = buff[:index-1] + chr(keyin) + buff[index-1:]
                 self.redraw_buffer(buff)
-                self.stdscr.move(_y, min(_x, len(buff) + 2))
+                self.stdscr.move(_y, min(_x, len(buff) + len(self.prompt)))
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
 
     def redraw_buffer(self, buff):
         self.stdscr.addstr(self.height-1, 0, " "*(self.width-3))
-        self.stdscr.addstr(self.height-1, 0, "> %s" % buff)
+        self.stdscr.addstr(self.height-1, 0, "%s%s" % (self.prompt, buff))
 
     def process_history_command(self, keyin, hist_counter):
         hist_commands = [(s,c) for s,c in self.backbuffer if c]
@@ -200,7 +202,7 @@ class Shell():
         buff = hist_commands[-hist_counter][0]
 
         self.stdscr.addstr(self.height-1, 0, " "*(self.width-3))
-        self.stdscr.addstr(self.height-1, 0, "> %s" % buff)
+        self.stdscr.addstr(self.height-1, 0, "%s%s" % (self.prompt, buff))
 
         if keyin == curses.KEY_UP and hist_counter < len(hist_commands):
             hist_counter += 1
@@ -236,9 +238,9 @@ class Shell():
             ret_choice = constants.CHOICE_INVALID
             choice = self.script_in()
             if choice:
-                self.put("> %s" % choice)
+                self.put("%s%s" % (self.prompt, choice))
             else:
-                choice = self._input("> ")
+                choice = self._input(self.prompt)
             tokens = choice.split()
             if len(tokens) == 0:
                 self.put("\n")
