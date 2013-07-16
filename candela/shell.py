@@ -7,6 +7,11 @@ import constants
 
 
 class Shell():
+    """
+    The main Candela class
+    Controls the shell by taking control of the current terminal window.
+    Performs input and output to the user
+    """
     def __init__(self, scriptfile=None):
         """
         Create an instance of a Shell
@@ -304,8 +309,6 @@ class Shell():
         hist_commands = [(s,c) for s,c in self.backbuffer if c]
         if not hist_commands:
             return hist_counter, ""
-
-        #hist_commands.reverse()
 
         buff = hist_commands[-hist_counter][0]
 
