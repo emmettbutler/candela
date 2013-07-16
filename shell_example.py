@@ -49,9 +49,9 @@ class MyShell(Shell):
         builtins_menu.title = "Built-in commands menu"
         builtins_menu.commands = [script_com, hello_world_com, back_com, quit_com]
 
-        # list of menus
+        # list of all menus in the app
         self.menus = [main_menu, builtins_menu]
-        # default menu
+        # name of default menu
         self.menu = 'main'
 
         self.put("""

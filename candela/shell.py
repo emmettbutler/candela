@@ -367,7 +367,11 @@ class Shell():
             if len(tokens) == 0:
                 self.put("\n")
                 continue
-            for command in self.get_menu().commands:
+            menu = self.get_menu()
+            commands = []
+            if menu:
+                commands = menu.commands
+            for command in commands:
                 if tokens[0] == command.name or tokens[0] in command.aliases:
                     args, kwargs = command.parse_command(tokens)
                     success, message = command.validate(*args, **kwargs)
@@ -381,6 +385,9 @@ class Shell():
             if success:
                 if ret_choice == constants.CHOICE_INVALID:
                     self.put("Invalid command")
+                if len(commands) == 0:
+                    self.put("No commands found. Maybe you forgot to set self.menus or self.menu?")
+                    self.put("Hint: use F1 to quit")
 
         return self
 
@@ -389,7 +396,10 @@ class Shell():
         Get the current menu as a Menu
         """
         if not self.menus: return
-        return [a for a in self.menus if a.name == self.menu][0]
+        try:
+            return [a for a in self.menus if a.name == self.menu][0]
+        except:
+            return
 
     def defer(self, func, args=(), kwargs={}, timeout_duration=10, default=None):
         """
