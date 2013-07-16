@@ -27,7 +27,7 @@ class Shell():
         self._header_bottom = 0
         self._header_right = 0
 
-        self.prompt = "butts> "
+        self.prompt = "> "
 
     def parse_script_file(self, filename):
         self.scriptfile = filename
@@ -150,8 +150,10 @@ class Shell():
             backbuf_string = line
             to_append = (backbuf_string, command)
             if line != self.prompt:
-                self.backbuffer.append(to_append)
-                # TODO - stop backbuffer from growing huge
+                index = 0
+                if len(self.backbuffer) >= 200:
+                    index = 1
+                self.backbuffer = self.backbuffer[index:] + [to_append]
 
     def _input(self, prompt):
         self.put(prompt)
@@ -161,9 +163,7 @@ class Shell():
         while keyin != 10:
             keyin = self.stdscr.getch()
             _y,_x = self.stdscr.getyx()
-            index = _x - len(self.prompt)  # TODO - all of the 2's here are magic numbers that depend
-                            # on the length of the prompt string being 2.
-                            # allow a user-selectable prompt and check its width
+            index = _x - len(self.prompt)
             #self.stdscr.addstr(20, 70, str(keyin))
             if keyin in [127, 263]:  # backspaces
                 buff = buff[:index] + buff[index+1:]
