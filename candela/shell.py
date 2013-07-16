@@ -26,6 +26,7 @@ class Shell():
         self.header = ""
         self._header_bottom = 0
         self._header_right = 0
+        self._header_right_margin = 50
 
         self.prompt = "> "
 
@@ -93,10 +94,11 @@ class Shell():
     def print_header(self):
         ht = 0
         for line in self.header.split("\n"):
-            self.stdscr.addstr(ht, 0, line)
+            self.stdscr.addstr(ht, 0, line + (" "*self._header_right_margin))
             if len(line) > self._header_right:
                 self._header_right = len(line)
             ht += 1
+        self.stdscr.addstr(ht, 0, " "*(self._header_right+self._header_right_margin))
         self._header_bottom = ht
         self.mt_width = self._header_right + 49
 
@@ -115,7 +117,7 @@ class Shell():
         helpstrings = [" %s" % a for a in _helpstring.split("\n")]
         ht = 0
         longest = len(max(helpstrings, key=len))
-        _x = self._header_right + 50
+        _x = self._header_right + self._header_right_margin
         if _x + longest > self.width:
             _x = self.width - longest - 1
         for line in helpstrings:

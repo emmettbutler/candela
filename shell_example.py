@@ -19,8 +19,7 @@ class MyShell(Shell):
  / /  / _` | '_ \ / _` |/ _ \ |/ _` |
 / /__| (_| | | | | (_| |  __/ | (_| |
 \____/\__,_|_| |_|\__,_|\___|_|\__,_|
-                                     
-        """
+                                      """
 
         # place sticky text on the top right side of the shell
         # you can change this text by calling sticker() from a command
@@ -41,14 +40,14 @@ class MyShell(Shell):
         main_menu.title = "Main menu"
         # list of Command objects making up menu
         main_menu.commands = [hello_world_com, named_com, complex_com, sticker_com,
-                              builtins_com, invalid_com, quit_com]
+                              invalid_com, builtins_com, quit_com]
 
         script_com = self.build_script_command()
         back_com = self.build_back_command()
 
         builtins_menu = Menu('builtins')
         builtins_menu.title = "Built-in commands menu"
-        builtins_menu.commands = [script_com, back_com, quit_com]
+        builtins_menu.commands = [script_com, hello_world_com, back_com, quit_com]
 
         # list of menus
         self.menus = [main_menu, builtins_menu]
@@ -168,13 +167,40 @@ data to the user.
     def build_builtin_command(self):
         com = Command('builtins', 'Go to builtin commands menu')
         def _run(*args, **kwargs):
+            self.put("""
+Commands can conditionally lead the user to other menus.
+This demo app has two menus defined: the main menu and the built-in commands menu.
+The command you just ran has defined the attribute self.new_menu to point to the
+builtins menu.
+
+Notice that the options menu has changed to reflect the new commands available in this menu.
+            """)
             return constants.CHOICE_VALID
         com.run = _run
         com.new_menu = 'builtins'
         return com
 
     def build_script_command(self):
-        return RunScriptCommand(self)
+        com = RunScriptCommand(self)
+        def _run(*args, **kwargs):
+            self.put("""
+This command runs a script.
+A Candela script is simply a text file containing one command per line.
+            """)
+            com.default_run(*args, **kwargs)
+            return constants.CHOICE_VALID
+        com.run = _run
+
+        def _val(*args, **kwargs):
+            success, message = com.default_validate(*args, **kwargs)
+            if not success:
+                self.put("""
+Try running\nrun script_example.txt
+                """)
+                return (False, message)
+            return (success, message)
+        com.validate = _val
+        return com
 
     def build_back_command(self):
         return BackCommand('main')
