@@ -8,7 +8,17 @@ import constants
 
 class Shell():
     def __init__(self, scriptfile=None):
-        self.script_lines = self.parse_script_file(scriptfile)
+        """
+        Create an instance of a Shell
+        This call takes over the current terminal by calling curses.initscr()
+        Sets global shell state, including size information, menus, stickers,
+        the header, and the prompt.
+
+        Kwargs:
+        scriptfile - the name of the script file to run. If not None and the
+                     file exists, the script will be immediately run.
+        """
+        self.script_lines = self._parse_script_file(scriptfile)
         self.script_counter = 0
         self.scriptfile = ""
 
@@ -30,7 +40,13 @@ class Shell():
 
         self.prompt = "> "
 
-    def parse_script_file(self, filename):
+    def _parse_script_file(self, filename):
+        """
+        Open a file if it exists and return its contents as a list of lines
+
+        Args:
+        filename - the file to attempt to open
+        """
         self.scriptfile = filename
         try:
             f = open(filename, 'r')
@@ -42,10 +58,24 @@ class Shell():
         return script_lines
 
     def runscript(self, scriptfile):
-        self.script_lines = self.parse_script_file(scriptfile)
+        """
+        Set up the global shell state necessary to run a script from a file
+
+        Args:
+        scriptfile - the string name of the file containing the script.
+                     paths are relative to system cwd
+        """
+        self.script_lines = self._parse_script_file(scriptfile)
         self.script_counter = 0
 
-    def print_backbuffer(self):
+    def _print_backbuffer(self):
+        """
+        Print the previously printed output above the current command line.
+
+        candela.shell.Shell stores previously printed commands and output
+        in a backbuffer. Like a normal shell, it handles printing these lines
+        in reverse order to allow the user to see their past work.
+        """
         rev = list(self.backbuffer)
         rev.reverse()
         i = 0
@@ -60,6 +90,25 @@ class Shell():
             i += 1
 
     def sticker(self, output, new_output="", pos=None):
+        """
+        Place, change, or remove a sticker from the shell window.
+
+        Candela has the concept of a sticker - a small block of text that
+        is "stuck" to the window. They can be used to convey persistent
+        information to the shell user.
+
+        If only output is specified, this creates a new sticker with the string
+        output. If output and new_output are specified, and there is an existing
+        sticker whose text is the same as output, this will replace that
+        sticker's text with new_output.
+
+        Args:
+        output      - The text of the sticker to manipulate
+
+        Kwargs:
+        new_output  - The text that will replace the text of the chosen sticker
+        pos         - The (y, x) tuple indicating where to place the sticker
+        """
         if len(self.stickers) > 0:
             sort = sorted(self.stickers, key=lambda x: x[1][0], reverse=True)
             ht = sort[0][1][0]+1
@@ -291,7 +340,7 @@ class Shell():
     def update_screen(self):
         self.stdscr.clear()
 
-        self.print_backbuffer()
+        self._print_backbuffer()
 
         if self.width < self._header_right + 80 or self.height < self._header_bottom + 40:
             pass
