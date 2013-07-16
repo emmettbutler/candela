@@ -478,4 +478,3 @@ class Shell():
         self._print_stickers()
 
         self.stdscr.refresh()
-
