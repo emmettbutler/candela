@@ -1,6 +1,7 @@
 import curses
 import sys
 import threading
+import textwrap
 
 import constants
 
@@ -131,7 +132,15 @@ class Shell():
         if pos:
             _x,_y = pos
 
+        lines = []
         for line in output.split('\n'):
+            if len(line) > self.width - 3:
+                for line in textwrap.wrap(line, self.width-3):
+                    lines.append(line)
+            else:
+                lines.append(line)
+
+        for line in lines:
             # put the line
             self.stdscr.addstr(_x, _y, line)
 
@@ -279,9 +288,13 @@ class Shell():
         self.stdscr.clear()
 
         self.print_backbuffer()
-        self.print_header()
-        if self.should_show_help:
-            self.print_help()
+
+        if self.width < self._header_right + 80 or self.height < self._header_bottom + 40:
+            pass
+        else:
+            self.print_header()
+            if self.should_show_help:
+                self.print_help()
         self.print_stickers()
 
         self.stdscr.refresh()
