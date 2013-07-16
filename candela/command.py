@@ -2,7 +2,35 @@ import constants
 
 
 class Command(object):
+    """
+    The representation of a single command available to the user
+    A command exists within one menu at a time.
+    A single command object can be used in multiple menus.
+    """
     def __init__(self, definition, description):
+        """
+        Creates a new generic command, setting the default functions for run()
+        and validate().
+        These two commands are called on each matched command during the main loop.
+        First, validate() is called. If validate() returns True, then run() is
+        called. These are the default implementations, and can be overridden.
+
+        The default validation function simply parses the command definition and
+        ensures that those arguments specified as required by that definition are
+        present in a command input string.
+
+        The default run function does nothing. It only returns the marker for
+        command success and exits.
+
+        The parser implements a specific syntax for required and optional arguments.
+        See parse_definition() for details.
+
+        Args:
+        definition      - The definition string, following the specific syntax
+                          detailed in the parse_definition() docstring
+        description     - The human-readable description of what the command does
+                          and how to use it
+        """
         self.name = definition.split()[0]
         self.aliases = []
 
@@ -31,9 +59,35 @@ class Command(object):
         self.validate = validator
         self.default_validate = validator
 
+        # the menu to transfer to when the command returns CHOICE_VALID
         self.new_menu = ''
 
     def parse_command(self, tokens):
+        """
+        Parse a command input string into a series of tokens, and subsequently
+        argument data.
+
+        The syntax for a command input string is simple. It consists of the command
+        name or alias followed by a sequence of space-separated tokens. A token
+        can be either a single-letter flag prefixed with '-' or a word of
+        abritrary length.
+
+        Semantics of command input strings:
+        command     ::= command_name ([flag] argument)*
+        flag        ::= -(letter)
+        argument    ::= (letter | digit | _)*
+        command_name::= (letter | digit | _)*
+        letter      ::= (lowercase | uppercase)*
+        lowercase   ::= "a"..."z"
+        uppercase   ::= "A"..."Z"
+        digit       ::= "0"..."9"
+
+        Args:
+        tokens  - The list of tokens, the result of input_string.split()
+
+        Returns the tuple of positional arguments and the dictionary of
+        flag: arg_value pairs of keyword arguments
+        """
         args = []
         kwargs = {}
         current_key = None
@@ -58,6 +112,35 @@ class Command(object):
         return (args, kwargs)
 
     def parse_definition(self, tokens):
+        """
+        Parse the command definition into a listing of required commands, to
+        be used for validation
+
+        The syntax of command definitions allows the specification of positional
+        and named arguments. The named arguments can be required or optional. All
+        positional arguments are required.
+
+        Command definition semantics:
+        definition      ::= command_name (positional | named)*
+        command_name    ::= (letter | digit | _)*
+        positional      ::= (letter | digit | _)*
+        argument        ::= (letter | digit | _)*
+        named           ::= (required | optional)
+        required        ::= "<"flag argument">"
+        optional        ::= "["flag argument"]"
+        flag            ::= -(letter)
+        letter          ::= (lowercase | uppercase)*
+        lowercase       ::= "a"..."z"
+        uppercase       ::= "A"..."Z"
+        digit           ::= "0"..."9"
+
+        More directly, this is an example command definition:
+        my_command arg1 arg2 <-f im_required> [-o im_optional]
+        You can also examine shell_example.py for more examples of command definitions
+
+        Args:
+        tokens  - The list of tokens, the result of definition.split()
+        """
         args = []
         kwargs = {}  # key: (value, optional)
         parsing_optional = False

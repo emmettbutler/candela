@@ -30,14 +30,19 @@ class Shell():
         self.stdscr = curses.initscr()
         self.stdscr.keypad(1)
 
+        # holds the backlog of shell output
         self.backbuffer = []
         self.height,self.width = self.stdscr.getmaxyx()
 
+        # the list of menus in the shell app
         self.menus = []
+        # the currently visible stickers in the app
         self.stickers = []
 
+        # should the command menu be shown
         self.should_show_help = True
 
+        # the text to stick in the upper left corner of the window
         self.header = ""
         self._header_bottom = 0
         self._header_right = 0
