@@ -148,6 +148,11 @@ This is a command that always fails to validate.
 Commands can run arbitrary python via a callback. Here's a callback that reads a
 file from your local drive and prints it to the shell.
             """)
+            try:
+                with open(kwargs['f'], 'r') as f:
+                    self.put(f.read())
+            except IOError:
+                self.put("%s : No such file!" % kwargs['f'])
             return constants.CHOICE_VALID
         com.run = _run
         return com
@@ -209,11 +214,6 @@ Try running\nrun script_example.txt
         quit_com = QuitCommand(self.name)
         quit_com.alias('q')
         return quit_com
-
-    def do_something_complex(self):
-        # magic, mystery, arbitrary python code here
-        self.put("Missingno")
-        return 42
 
 
 if __name__ == "__main__":
