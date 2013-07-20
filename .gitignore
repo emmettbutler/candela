@@ -2,3 +2,4 @@
 .*.un~
 *.pyc
 build
+dist
