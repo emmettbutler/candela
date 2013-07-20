@@ -1,6 +1,10 @@
 from distutils.core import setup
 
-setup(name='candela',
-      version='1.0',
+setup(name='Candela',
+      version='0.1',
+      description="Python shell creation library",
+      author="Emmett Butler",
+      author_email="emmett.butler321@gmail.com",
+      url="https://github.com/emmett9001/candela",
       packages=['candela'],
       )
