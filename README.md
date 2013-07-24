@@ -38,6 +38,10 @@ You can also clone this repo to take a closer look at the code and demo app.
 
     git clone https://github.com/emmett9001/candela.git
 
+Then, install the library with
+
+    python setup.py install
+
 Basic Use
 ---------
 
