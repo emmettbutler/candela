@@ -108,3 +108,20 @@ Support
 
 If you need help using Candela, or have found a bug, please create an issue on
 the [Github repo](https://github.com/emmett9001/candela/issues).
+
+License
+-------
+
+    Copyright 2013 Emmett Butler
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
