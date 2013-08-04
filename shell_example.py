@@ -14,8 +14,8 @@ class MyShell(Shell):
 
         # set the header that appears in the top left of the shell
         self.header = """
-   ___                _      _       
-  / __\__ _ _ __   __| | ___| | __ _ 
+   ___                _      _
+  / __\__ _ _ __   __| | ___| | __ _
  / /  / _` | '_ \ / _` |/ _ \ |/ _` |
 / /__| (_| | | | | (_| |  __/ | (_| |
 \____/\__,_|_| |_|\__,_|\___|_|\__,_|
@@ -121,6 +121,13 @@ Try this:
         def _complete_myarg(frag):
             return ['some', 'random', 'choices']
         com.tabcomplete_hooks['my_arg'] = _complete_myarg
+
+        def _complete_file(frag):
+            from os import listdir
+            from os.path import isfile, join
+            onlyfiles = [f for f in listdir('.') if isfile(join('.',f))]
+            return onlyfiles
+        com.tabcomplete_hooks['filename'] = _complete_file
 
         return com
 

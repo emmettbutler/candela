@@ -209,13 +209,22 @@ class Command(object):
             return []
         func = __default
         tokens = buff.split()
-        if '-' in tokens[-1]:
+        if '-' in tokens[-1] and not buff.endswith(' '):
             return []
-        arg_is_named = '-' in tokens[-2] if len(tokens) > 2 else False
+        if len(tokens) >= 2:
+            if buff.endswith(' '):
+                arg_is_named = '-' in tokens[-1]
+            else:
+                arg_is_named = '-' in tokens[-2]
+        else:
+            arg_is_named = False
         num_named = len([a for a in tokens if '-' in a])
         if arg_is_named:
             try:
-                arg_name = self.kwargs[tokens[-2]]
+                flag_index = -2
+                if buff.endswith(' '):
+                    flag_index = -1
+                arg_name, reqd = self.kwargs[tokens[flag_index].strip('-')]
             except:
                 return __default(tokens[-1])
         else:
@@ -234,7 +243,6 @@ class Command(object):
         if buff.endswith(' '):
             return results
         return [a for a in results if a.startswith(tokens[-1])]
-
 
 
 class BackCommand(Command):
