@@ -182,7 +182,10 @@ class Command(object):
 
 
     def __str__(self):
-        return "%s\n    %s" % (self.definition, self.description)
+        ret = "%s\n    %s" % (self.definition, self.description)
+        if self.aliases:
+            ret += "\n    Aliases: %s" % ",".join(self.aliases)
+        return ret
 
     def alias(self, alias):
         """
