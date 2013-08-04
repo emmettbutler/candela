@@ -59,6 +59,11 @@ class Command(object):
         self.validate = validator
         self.default_validate = validator
 
+        # the hooks used to tab complete each argument
+        # keys are the argument names used in the definition, values are callbacks
+        # returning lists of completions
+        self.tabcomplete_hooks = {}
+
         # the menu to transfer to when the command returns CHOICE_VALID
         self.new_menu = ''
 
@@ -198,6 +203,31 @@ class Command(object):
         """
         if alias not in self.aliases:
             self.aliases.append(alias)
+
+    def _tabcomplete(self, buff):
+        def __default(frag):
+            return []
+        func = __default
+        tokens = buff.split()
+        if '-' in tokens[-1]:
+            return []
+        arg_is_named = '-' in tokens[-2] if len(tokens) > 2 else False
+        num_named = len([a for a in tokens if '-' in a])
+        if arg_is_named:
+            try:
+                arg_name = self.kwargs[tokens[-2]]
+            except:
+                return __default(tokens[-1])
+        else:
+            arg_index = len(tokens) - (2 * num_named) - 1
+            try:
+                arg_name = self.args[arg_index]
+            except:
+                return __default(tokens[-1])
+        if arg_name in self.tabcomplete_hooks:
+            func = self.tabcomplete_hooks[arg_name]
+        return func(tokens[-1])
+
 
 class BackCommand(Command):
     """

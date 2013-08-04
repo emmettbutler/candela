@@ -281,7 +281,10 @@ class Shell():
             elif keyin in [9]:
                 choices = self._tabcomplete(buff)
                 if len(choices) == 1:
-                    buff = choices[0]
+                    if len(buff.split()) == 1 and ' ' not in buff:
+                        buff = choices[0]
+                    else:
+                        buff += choices[0]
                 elif len(choices) > 1:
                     self.put("    ".join(choices))
                 elif len(choices) == 0:
@@ -307,13 +310,28 @@ class Shell():
         if menu:
             commands = menu.commands
         output = []
-        for command in commands:
-            if command.name.startswith(buff):
-                output.append(command.name)
-            for alias in command.aliases:
-                if alias.startswith(buff):
-                    output.append(alias)
+        if len(buff.split()) == 0:
+            for command in commands:
+                if command.name.startswith(buff):
+                    output.append(command.name)
+                for alias in command.aliases:
+                    if alias.startswith(buff):
+                        output.append(alias)
+        else:
+            command = self._get_command(buff)
+            if command:
+                output = command._tabcomplete(buff)
         return output
+
+    def _get_command(self, buff):
+        menu = self.get_menu()
+        commands = []
+        if menu:
+            commands = menu.commands
+        for command in commands:
+            if command.name == buff.split()[0]:
+                return command
+        return None
 
     def _redraw_buffer(self, buff):
         """
@@ -396,7 +414,11 @@ class Shell():
                 commands = menu.commands
             for command in commands:
                 if tokens[0] == command.name or tokens[0] in command.aliases:
-                    args, kwargs = command.parse_command(tokens)
+                    try:
+                        args, kwargs = command.parse_command(tokens)
+                    except Exception as e:
+                        self.put(e)
+                        break
                     success, message = command.validate(*args, **kwargs)
                     if not success:
                         self.put(message)
