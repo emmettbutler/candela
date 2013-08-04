@@ -281,10 +281,11 @@ class Shell():
             elif keyin in [9]:
                 choices = self._tabcomplete(buff)
                 if len(choices) == 1:
-                    if len(buff.split()) == 1 and ' ' not in buff:
+                    if len(buff.split()) == 1 and not buff.endswith(' '):
                         buff = choices[0]
                     else:
-                        buff += choices[0]
+                        buff = ' '.join(buff.split()[:-1])
+                        buff += ' ' + choices[0]
                 elif len(choices) > 1:
                     self.put("    ".join(choices))
                 elif len(choices) == 0:
@@ -310,7 +311,7 @@ class Shell():
         if menu:
             commands = menu.commands
         output = []
-        if len(buff.split()) == 0:
+        if len(buff.split()) <= 1 and ' ' not in buff:
             for command in commands:
                 if command.name.startswith(buff):
                     output.append(command.name)

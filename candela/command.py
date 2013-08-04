@@ -219,14 +219,22 @@ class Command(object):
             except:
                 return __default(tokens[-1])
         else:
-            arg_index = len(tokens) - (2 * num_named) - 1
+            arg_index = len(tokens) - (2 * num_named)
+            if buff.endswith(' '):
+                arg_index -= 1
+            else:
+                arg_index -= 2
             try:
                 arg_name = self.args[arg_index]
             except:
                 return __default(tokens[-1])
         if arg_name in self.tabcomplete_hooks:
             func = self.tabcomplete_hooks[arg_name]
-        return func(tokens[-1])
+        results = func(tokens[-1])
+        if buff.endswith(' '):
+            return results
+        return [a for a in results if a.startswith(tokens[-1])]
+
 
 
 class BackCommand(Command):

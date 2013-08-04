@@ -117,6 +117,11 @@ Try this:
             self.put("Positional arguments in a list, named arguments in a dictionary")
             return constants.CHOICE_VALID
         com.run = _run
+
+        def _complete_myarg(frag):
+            return ['some', 'random', 'choices']
+        com.tabcomplete_hooks['my_arg'] = _complete_myarg
+
         return com
 
     def build_invalid_command(self):
