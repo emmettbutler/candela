@@ -278,6 +278,15 @@ class Shell():
             elif keyin == curses.KEY_F1:
                 curses.endwin()
                 sys.exit()
+            elif keyin in [9]:
+                choices = self._tabcomplete(buff)
+                if len(choices) == 1:
+                    buff = choices[0]
+                elif len(choices) > 1:
+                    self.put("    ".join(choices))
+                elif len(choices) == 0:
+                    pass
+                self._redraw_buffer(buff)
             elif keyin in [260, 261]:
                 if keyin == 260:
                     newx = max(_x - 1, len(self.prompt))
@@ -291,6 +300,20 @@ class Shell():
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
+
+    def _tabcomplete(self, buff):
+        menu = self.get_menu()
+        commands = []
+        if menu:
+            commands = menu.commands
+        output = []
+        for command in commands:
+            if command.name.startswith(buff):
+                output.append(command.name)
+            for alias in command.aliases:
+                if alias.startswith(buff):
+                    output.append(alias)
+        return output
 
     def _redraw_buffer(self, buff):
         """
