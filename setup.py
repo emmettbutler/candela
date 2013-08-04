@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='Candela',
-      version='0.1.1',
+      version='0.2.0',
       description="Python shell creation library",
       author="Emmett Butler",
       author_email="emmett.butler321@gmail.com",
