@@ -8,6 +8,7 @@ Features
 
 * Commands are 100% python and can run aribtrary code
 * Commands can run code in secondary threads for asynchronous operation
+* Customizable tab completion hooks for command arguments
 * Responsive layout for smaller terminals
 * Numerous built-in command templates
 * Simple command syntax and help system
