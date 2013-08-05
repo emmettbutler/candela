@@ -551,7 +551,7 @@ class Shell():
 
         self._print_backbuffer()
 
-        if self.width < self._header_right + 80 or self.height < self._header_bottom + 40:
+        if self.width < self._header_right + 80 or self.height < self._header_bottom + 37:
             pass
         else:
             self._print_header()
