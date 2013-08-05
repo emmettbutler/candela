@@ -310,6 +310,19 @@ class Shell():
         return buff
 
     def _tabcomplete(self, buff):
+        """
+        Get a list of possible completions for the current buffer
+
+        If the current buffer doesn't contain a valid command, see if the
+        buffer is a prefix of any valid commands. If so, return those as possible
+        completions. Otherwise, delegate the completion finding to the command object.
+
+        Args:
+        buff    - The string buffer representing the current unfinished command input
+
+        Return:
+        A list of completion strings for the current token in the command
+        """
         menu = self.get_menu()
         commands = []
         if menu:
@@ -329,6 +342,15 @@ class Shell():
         return output
 
     def _get_command(self, buff):
+        """
+        Get the command instance referenced by string in the current input buffer
+
+        Args:
+        buff    - The string version of the current command input buffer
+
+        Return:
+        The Command instance corresponding to the buffer command
+        """
         menu = self.get_menu()
         commands = []
         if menu:

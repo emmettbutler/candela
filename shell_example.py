@@ -96,9 +96,15 @@ Named arguments are wrapped in either <> or [], and contain both the argument na
 (starting with '-') and a helpful tip about the argument function.
 Named arguments with <> are required, those with [] are optional.
 
+This command also demonstrates customizable tab completion hooks. Try pressing
+Tab after typing '%s s' and before typing enter. You'll see a list of possible
+completions for your argument.
+
+You can customize these commands by supplying callbacks to Command.tabcomplete_hooks.
+
 
 Try passing arguments to this command!
-                    """ % com.name)
+                    """ % (com.name, com.name))
                 else:
                     self.put("""
 This command requires one unnamed argument followed by a named argument (-f).

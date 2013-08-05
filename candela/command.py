@@ -205,6 +205,34 @@ class Command(object):
             self.aliases.append(alias)
 
     def _tabcomplete(self, buff):
+        """
+        Get a list of possible completions for the current buffer, called when
+        the user presses Tab.
+
+        This is called in the event that the buffer starts with a valid command name
+        and contains unfinished argument input.
+
+        Partially parses the command string, determines the name of the argument
+        currently being typed, and calls the Command object's tabcomplete hook
+        corresponding to that argument.
+
+        Tabcomplete hooks are callback functions that can be defined per command
+        argument. They take as an argument the current last token in the command input
+        buffer, which is usually a fragment of an argument. They return a list of
+        strings representing possible completions for the current argument. The
+        default hook returns an empty list.
+
+        Hooks are looked up from the self.tabcomplete_hooks dictionary by
+        argument name. For example, if this command takes an argument my_arg like so:
+        testcommand my_arg
+        the corresponding tabcomplete hook can be found in self.tabcomplete_hooks['my_arg']
+
+        Args:
+        buff    - The string buffer representing the current unfinished command input
+
+        Return:
+        A list of completion strings for the current token in the command
+        """
         def __default(frag):
             return []
         func = __default
