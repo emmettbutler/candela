@@ -284,8 +284,12 @@ class Shell():
                     if len(buff.split()) == 1 and not buff.endswith(' '):
                         buff = choices[0]
                     else:
-                        buff = ' '.join(buff.split()[:-1])
-                        buff += ' ' + choices[0]
+                        if len(buff.split()) != 1:
+                            buff = ' '.join(buff.split()[:-1])
+                        if buff.endswith(' '):
+                            buff += choices[0]
+                        else:
+                            buff += ' ' + choices[0]
                 elif len(choices) > 1:
                     self.put("    ".join(choices))
                 elif len(choices) == 0:
