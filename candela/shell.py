@@ -2,6 +2,7 @@ import curses
 import sys
 import threading
 import textwrap
+import platform
 
 import constants
 
@@ -29,6 +30,8 @@ class Shell():
 
         self.stdscr = curses.initscr()
         self.stdscr.keypad(1)
+
+        self.platform = self._get_platform()
 
         # holds the backlog of shell output
         self.backbuffer = []
@@ -270,15 +273,22 @@ class Shell():
             index = _x - len(self.prompt)
             #self.stdscr.addstr(20, 70, str(keyin))  # for debugging
             if keyin in [127, 263]:  # backspaces
-                buff = buff[:index-3] + buff[index-2:]
+                del_lo, del_hi = self._get_backspace_indices()
+                buff = buff[:index+del_lo] + buff[index+del_hi:]
                 self._redraw_buffer(buff)
-                self.stdscr.move(_y, max(_x-len(self.prompt)-1, len(self.prompt)))
-            elif keyin in [curses.KEY_DOWN, curses.KEY_UP]:
+                self.stdscr.move(_y, max(_x+del_lo, len(self.prompt)))
+            elif keyin in [curses.KEY_UP, curses.KEY_DOWN]:  # up and down arrows
                 hist_counter,buff = self._process_history_command(keyin, hist_counter)
-            elif keyin == curses.KEY_F1:
+            elif keyin in [curses.KEY_LEFT, curses.KEY_RIGHT]:  # left, right arrows
+                if keyin == curses.KEY_LEFT:
+                    newx = max(_x - 1, len(self.prompt))
+                elif keyin == curses.KEY_RIGHT:
+                    newx = min(_x + 1, len(buff) + len(self.prompt))
+                self.stdscr.move(_y, newx)
+            elif keyin == curses.KEY_F1:  # F1
                 curses.endwin()
                 sys.exit()
-            elif keyin in [9]:
+            elif keyin in [9]:  # tab
                 choices = self._tabcomplete(buff)
                 if len(choices) == 1:
                     if len(buff.split()) == 1 and not buff.endswith(' '):
@@ -295,19 +305,19 @@ class Shell():
                 elif len(choices) == 0:
                     pass
                 self._redraw_buffer(buff)
-            elif keyin in [260, 261]:
-                if keyin == 260:
-                    newx = max(_x - 1, len(self.prompt))
-                elif keyin == 261:
-                    newx = min(_x + 1, len(buff) + len(self.prompt))
-                self.stdscr.move(_y, newx)
-            elif keyin >= 32 and keyin <= 126:
+            elif keyin >= 32 and keyin <= 126:  # ascii input
                 buff = buff[:index-1] + chr(keyin) + buff[index-1:]
                 self._redraw_buffer(buff)
                 self.stdscr.move(_y, min(_x, len(buff) + len(self.prompt)))
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
+
+    def _get_backspace_indices(self):
+        if self.platform == "Linux":
+            return (0, 1)
+        elif self.platform == "Darwin":
+            return (-len(self.prompt)-1, -len(self.prompt))
 
     def _tabcomplete(self, buff):
         """
@@ -550,3 +560,10 @@ class Shell():
         self._print_stickers()
 
         self.stdscr.refresh()
+
+    def _get_platform(self):
+        """
+        Return the platform name. This is fine, but it's used in a hacky way to
+        get around a backspace-cooking behavior in Linux (at least Ubuntu)
+        """
+        return platform.uname()[0]
