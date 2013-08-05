@@ -1,5 +1,6 @@
 import curses
 import sys
+import signal
 import threading
 import textwrap
 import platform
@@ -24,6 +25,8 @@ class Shell():
         scriptfile - the name of the script file to run. If not None and the
                      file exists, the script will be immediately run.
         """
+        self._register_sigint_handler()
+
         self.script_lines = self._parse_script_file(scriptfile)
         self.script_counter = 0
         self.scriptfile = ""
@@ -542,6 +545,16 @@ class Shell():
         End the current Candela shell and safely shut down the curses session
         """
         curses.endwin()
+
+    def _register_sigint_handler(self):
+        """
+        Properly handle ^C and any other method of sending SIGINT.
+        This avoids leaving the user with a borked up terminal.
+        """
+        def signal_handler(signal, frame):
+            self.end()
+            sys.exit(0)
+        signal.signal(signal.SIGINT, signal_handler)
 
     def _update_screen(self):
         """
