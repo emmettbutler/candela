@@ -547,6 +547,7 @@ class Shell():
         """
         Refresh the screen and redraw all elements in their appropriate positions
         """
+        self.height,self.width = self.stdscr.getmaxyx()
         self.stdscr.clear()
 
         self._print_backbuffer()
