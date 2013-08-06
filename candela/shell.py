@@ -464,21 +464,23 @@ class Shell():
                 self.put("\n")
                 continue
             command = self._get_command(choice)
+            if not command:
+                self.put("Invalid command - no match")
+                continue
             try:
                 args, kwargs = command.parse_command(tokens)
                 success, message = command.validate(*args, **kwargs)
+                if not success:
+                    self.put(message)
+                else:
+                    ret_choice = command.run(*args, **kwargs)
+                    if ret_choice == constants.CHOICE_INVALID:
+                        self.put("Invalid command")
+                    else:
+                        if command.new_menu and ret_choice != constants.FAILURE:
+                            self.menu = command.new_menu
             except Exception as e:
                 self.put(e)
-            if not success:
-                self.put(message)
-            else:
-                ret_choice = command.run(*args, **kwargs)
-                if command.new_menu and ret_choice != constants.FAILURE:
-                    self.menu = command.new_menu
-            if success:
-                if ret_choice == constants.CHOICE_INVALID:
-                    self.put("Invalid command")
-
         return self
 
     def get_menu(self):
