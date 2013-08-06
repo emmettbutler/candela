@@ -380,8 +380,11 @@ class Shell():
         commands = []
         if menu:
             commands = menu.commands
+        if len(commands) == 0:
+            self.put("No commands found. Maybe you forgot to set self.menus or self.menu?")
+            self.put("Hint: use F1 to quit")
         for command in commands:
-            if command.name == buff.split()[0]:
+            if command.name == buff.split()[0] or buff.split()[0] in command.aliases:
                 return command
         return None
 
@@ -460,31 +463,21 @@ class Shell():
             if len(tokens) == 0:
                 self.put("\n")
                 continue
-            menu = self.get_menu()
-            commands = []
-            if menu:
-                commands = menu.commands
-            for command in commands:
-                if tokens[0] == command.name or tokens[0] in command.aliases:
-                    try:
-                        args, kwargs = command.parse_command(tokens)
-                    except Exception as e:
-                        self.put(e)
-                        break
-                    success, message = command.validate(*args, **kwargs)
-                    if not success:
-                        self.put(message)
-                        break
-                    else:
-                        ret_choice = command.run(*args, **kwargs)
-                        if command.new_menu and ret_choice != constants.FAILURE:
-                            self.menu = command.new_menu
+            command = self._get_command(choice)
+            try:
+                args, kwargs = command.parse_command(tokens)
+                success, message = command.validate(*args, **kwargs)
+            except Exception as e:
+                self.put(e)
+            if not success:
+                self.put(message)
+            else:
+                ret_choice = command.run(*args, **kwargs)
+                if command.new_menu and ret_choice != constants.FAILURE:
+                    self.menu = command.new_menu
             if success:
                 if ret_choice == constants.CHOICE_INVALID:
                     self.put("Invalid command")
-                if len(commands) == 0:
-                    self.put("No commands found. Maybe you forgot to set self.menus or self.menu?")
-                    self.put("Hint: use F1 to quit")
 
         return self
 
