@@ -49,7 +49,7 @@ class Shell():
         self.should_show_help = True
         # for commands with only positional args, show the
         # name of the next argument as the user types
-        self.should_show_hint = True
+        self.should_show_hint = False
 
         # the text to stick in the upper left corner of the window
         self.header = ""
