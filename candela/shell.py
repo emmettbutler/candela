@@ -300,7 +300,7 @@ class Shell():
                     if len(buff.split()) == 1 and not buff.endswith(' '):
                         buff = choices[0]
                     else:
-                        if len(buff.split()) != 1:
+                        if len(buff.split()) != 1 and not buff.endswith(' '):
                             buff = ' '.join(buff.split()[:-1])
                         if buff.endswith(' '):
                             buff += choices[0]
@@ -317,7 +317,7 @@ class Shell():
                 self.stdscr.move(_y, min(_x, len(buff) + len(self.prompt)))
                 if self.should_show_hint and keyin == 32:
                     command = self._get_command(buff)
-                    if '-' not in command.definition:
+                    if hasattr(command, 'definition') and '-' not in command.definition:
                         try:
                             nextarg = command.definition.split()[len(buff.split())]
                             self.stdscr.addstr(_y, _x+1, nextarg)
