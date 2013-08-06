@@ -51,6 +51,10 @@ class Shell():
         # name of the next argument as the user types
         self.should_show_hint = False
 
+        # dictionary of functions to call on key events
+        # keys are chars representing the pressed keys
+        self.keyevent_hooks = {}
+
         # the text to stick in the upper left corner of the window
         self.header = ""
         self._header_bottom = 0
@@ -278,6 +282,13 @@ class Shell():
             _y,_x = self.stdscr.getyx()
             index = _x - len(self.prompt)
             #self.stdscr.addstr(20, 70, str(keyin))  # for debugging
+            try:
+                if chr(keyin) in self.keyevent_hooks.keys():
+                    cont = self.keyevent_hooks[chr(keyin)](chr(keyin), buff)
+                    if cont == False:
+                        continue
+            except:
+                pass
             if keyin in [127, 263]:  # backspaces
                 del_lo, del_hi = self._get_backspace_indices()
                 buff = buff[:index+del_lo] + buff[index+del_hi:]

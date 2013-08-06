@@ -65,6 +65,15 @@ This is an instructional shell app built in Candela that demonstrates its functi
 Try any of the commands listed in the menu bar to continue.
         """)
 
+        def _backslash_event(key, buff):
+            self.put("""
+This is a key event hook. It is called every time you press %s, and runs a
+callback function that you define. This callback must take as parameters the
+key character that was pressed and the current state of the command input
+buffer.
+            """ % key)
+        self.keyevent_hooks['\\'] = _backslash_event
+
     def build_hello_command(self):
         com = Command('first_command', 'Intro to commands')
         def _run(*args, **kwargs):
