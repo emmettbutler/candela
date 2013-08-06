@@ -50,11 +50,11 @@ class Command(object):
                 if reqd:
                     required_params.append(kw)
             if len(args) + len(kwargs) < len(required_params):
-                return (False, "Missing arguments")
+                return (False, "Usage: %s" % self.definition)
             for kw in self.kwargs.keys():
                 name,reqd = self.kwargs[kw]
                 if reqd and kw not in kwargs.keys():
-                    return (False, "Missing argument %s (-%s) - %s" % (name, kw, kwargs))
+                    return (False, "Usage: %s" % (self.definition))
             return (True, "")
         self.validate = validator
         self.default_validate = validator
