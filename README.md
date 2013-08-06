@@ -78,12 +78,11 @@ Commands
 
 In general, a command instantiation looks like this
 
-    com = Command('first_command', 'Intro to commands')
+    com = Command('first_command an_arg <-f reqd_arg>', 'Intro to commands')
     def _run(*args, **kwargs):
         # do anything
         return constants.CHOICE_VALID
     com.run = _run
-    return com
 
 Functions that execute on command invocation are modeled as python first-class
 functions (callbacks).
