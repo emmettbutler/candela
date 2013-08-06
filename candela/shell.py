@@ -47,6 +47,9 @@ class Shell():
 
         # should the command menu be shown
         self.should_show_help = True
+        # for commands with only positional args, show the
+        # name of the next argument as the user types
+        self.should_show_hint = True
 
         # the text to stick in the upper left corner of the window
         self.header = ""
@@ -312,6 +315,15 @@ class Shell():
                 buff = buff[:index-1] + chr(keyin) + buff[index-1:]
                 self._redraw_buffer(buff)
                 self.stdscr.move(_y, min(_x, len(buff) + len(self.prompt)))
+                if self.should_show_hint and keyin == 32:
+                    command = self._get_command(buff)
+                    if '-' not in command.definition:
+                        try:
+                            nextarg = command.definition.split()[len(buff.split())]
+                            self.stdscr.addstr(_y, _x+1, nextarg)
+                            self.stdscr.move(_y, _x)
+                        except:
+                            pass
         self.put(buff, command=True)
         self.stdscr.refresh()
         return buff
