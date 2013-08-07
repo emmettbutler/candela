@@ -114,7 +114,7 @@ class Command(object):
         current_key = None
         parsing_named = False
         for token in tokens:
-            if token == self.name:
+            if token == self.name or token in self.aliases:
                 continue
             if "-" not in token:
                 if not parsing_named:
