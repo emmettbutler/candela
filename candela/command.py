@@ -337,5 +337,24 @@ class RunScriptCommand(Command):
         self.default_run = _run
 
 
+class ClearCommand(Command):
+    """
+    Command wrapper around Shell.clear()
+
+    Clears all scrollback text from the window
+    """
+    def __init__(self, shell):
+        super(ClearCommand, self).__init__('clear', 'Clear the screen')
+
+        self.shell = shell
+
+        def _run(*args, **kwargs):
+            self.shell.clear()
+            return constants.CHOICE_VALID
+        self.run = _run
+
+        self.default_run = _run
+
+
 class ParseException(Exception):
     pass

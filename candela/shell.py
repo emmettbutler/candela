@@ -196,6 +196,15 @@ class Shell():
         self._header_bottom = ht
         self.mt_width = self._header_right + 49
 
+    def clear(self):
+        """
+        Remove all scrollback text from the window
+        """
+        backbuffer = list(self.backbuffer)
+        printstring = "\n"
+        for i in range(self.height):
+            self.put(printstring)
+
     def _print_backbuffer(self):
         """
         Print the previously printed output above the current command line.
@@ -206,16 +215,15 @@ class Shell():
         """
         rev = list(self.backbuffer)
         rev.reverse()
-        i = 0
 
-        for string, iscommand in rev:
+        for i, tup in zip(range(len(rev)), rev):
+            string, iscommand = tup
             ypos = self.height-2-i
             if ypos > 0:
                 printstring = string
                 if iscommand:
                     printstring = "%s%s" % (self.prompt, string)
                 self.stdscr.addstr(ypos,0,printstring)
-            i += 1
 
     def _print_help(self):
         """

@@ -18,7 +18,7 @@ import getpass
 
 from candela.shell import Shell
 from candela.menu import Menu
-from candela.command import Command, QuitCommand, RunScriptCommand, BackCommand
+from candela.command import Command, QuitCommand, RunScriptCommand, BackCommand, ClearCommand
 from candela import constants
 
 
@@ -47,6 +47,7 @@ class MyShell(Shell):
         complex_com = self.build_complex_command()
         invalid_com = self.build_invalid_command()
         quit_com = self.build_quit_command()
+        clear_com = self.build_clear_command()
         sticker_com = self.build_sticker_command()
         builtins_com = self.build_builtin_command()
 
@@ -56,7 +57,7 @@ class MyShell(Shell):
         main_menu.title = "Main menu"
         # list of Command objects making up menu
         main_menu.commands = [hello_world_com, named_com, complex_com, sticker_com,
-                              invalid_com, builtins_com, quit_com]
+                              invalid_com, builtins_com, clear_com, quit_com, ]
 
         script_com = self.build_script_command()
         back_com = self.build_back_command()
@@ -257,6 +258,10 @@ Try running\nrun script_example.txt
         quit_com = QuitCommand(self.name)
         quit_com.alias('q')
         return quit_com
+
+    def build_clear_command(self):
+        clear_com = ClearCommand(self)
+        return clear_com
 
 
 if __name__ == "__main__":
