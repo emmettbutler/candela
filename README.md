@@ -5,6 +5,10 @@ help developers create customized command line interfaces. It has a simple
 interface, is well documented, and allows developers to take command-based
 tools to the next level of complexity and usability.
 
+This is free software, and you are welcome to redistribute it
+under certain conditions. See the
+[free software definition](http://www.gnu.org/philosophy/free-sw.html) for details
+
 Features
 --------
 
