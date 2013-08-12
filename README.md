@@ -94,6 +94,15 @@ In general, a command instantiation looks like this
 Functions that execute on command invocation are modeled as python first-class
 functions (callbacks).
 
+Running the Shell
+-----------------
+
+Once you've set up some commands and menus, you can create a runnable python
+script with your shell by using
+
+    if __name__ == "__main__":
+        MyShell().main_loop().end()
+
 Advanced Use
 ------------
 
