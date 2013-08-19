@@ -53,6 +53,10 @@ Then, install the library with
 Basic Use
 ---------
 
+First thing's first: if you really want to understand how to use Candela,
+*read the code*! There's a lot of documentation with code examples for the
+more complicated parts. A good starting point would be `shell.py`
+
 Importing
 ---------
 
