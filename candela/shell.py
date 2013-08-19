@@ -513,9 +513,7 @@ class Shell():
                         self.put("Invalid command")
                     else:
                         menus = [a.name for a in self.menus]
-                        if (command.new_menu and ret_choice != constants.FAILURE):
-                            self.menu = command.new_menu
-                        elif str(ret_choice).lower() in menus:
+                        if str(ret_choice).lower() in menus and ret_choice != constants.FAILURE:
                             self.menu = ret_choice.lower()
             except Exception as e:
                 self.put(e)

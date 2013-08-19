@@ -219,14 +219,13 @@ data to the user.
             self.put("""
 Commands can conditionally lead the user to other menus.
 This demo app has two menus defined: the main menu and the built-in commands menu.
-The command you just ran has defined the attribute self.new_menu to point to the
-builtins menu.
+The command you just ran has returned the string 'builtins' to point to the
+builtins menu. 'builtins' is the name of the new menu.
 
 Notice that the options menu has changed to reflect the new commands available in this menu.
             """)
-            return constants.CHOICE_VALID
+            return 'builtins'
         com.run = _run
-        com.new_menu = 'builtins'
         return com
 
     def build_script_command(self):

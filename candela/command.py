@@ -80,9 +80,6 @@ class Command(object):
         # returning lists of completions
         self.tabcomplete_hooks = {}
 
-        # the menu to transfer to when the command returns CHOICE_VALID
-        self.new_menu = ''
-
     def parse_command(self, tokens):
         """
         Parse a command input string into a series of tokens, and subsequently
@@ -296,10 +293,9 @@ class BackCommand(Command):
     """
     def __init__(self, tomenu):
         super(BackCommand, self).__init__('back', 'Back to the %s menu' % tomenu)
-        self.new_menu = tomenu
 
         def _run(*args, **kwargs):
-            return constants.CHOICE_BACK
+            return tomenu
         self.run = _run
 
         self.default_run = _run
