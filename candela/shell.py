@@ -513,8 +513,10 @@ class Shell():
                         self.put("Invalid command")
                     else:
                         menus = [a.name for a in self.menus]
-                        if str(ret_choice).lower() in menus and ret_choice != constants.FAILURE:
+                        if str(ret_choice).lower() in menus:
                             self.menu = ret_choice.lower()
+                        else:
+                            self.put("New menu '%s' not found" % ret_choice.lower()
             except Exception as e:
                 self.put(e)
         return self

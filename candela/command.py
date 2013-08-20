@@ -36,7 +36,9 @@ class Command(object):
         present in a command input string.
 
         The default run function does nothing. It only returns the marker for
-        command success and exits.
+        command success and exits. Command run functions can also return the string
+        name of another menu. If this happens, the shell state will switch to that
+        menu, if it exists.
 
         The parser implements a specific syntax for required and optional arguments.
         See parse_definition() for details.
@@ -288,7 +290,7 @@ class Command(object):
 
 class BackCommand(Command):
     """
-    A command that, on success, reverts the latest new_menu action by resetting
+    A command that, on success, reverts the latest new menu action by resetting
     the shell to the previous menu.
     """
     def __init__(self, tomenu):
