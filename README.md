@@ -35,6 +35,8 @@ There is an example shell project in `shell_example.py`. To run it, use
 
 in a maximized terminal window.
 
+![](http://i.imgur.com/oYgHWvP.png)
+
 Download
 --------
 
